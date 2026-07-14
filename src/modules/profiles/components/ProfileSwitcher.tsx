@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -49,7 +49,7 @@ async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: 'Unknown error' }));
-    const err: any = new Error(body.error || 'Request failed');
+    const err = new Error(body.error || 'Request failed') as Error & { status?: number };
     err.status = res.status;
     throw err;
   }
@@ -95,7 +95,8 @@ export default function ProfileSwitcher() {
   const archiveMutation = useMutation({ mutationFn: archiveProfile, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['profiles'] }); invalidateHabitsQueries(); if (activeProfileId) { const remaining = profiles.filter((p) => p.id.toString() !== activeProfileId); if (remaining.length > 0) router.replace(`/profiles/${remaining[0].id}`); } } });
   const targetMutation = useMutation({ mutationFn: ({ id, target_points }: { id: number; target_points: number }) => updateTarget(id, target_points), onMutate: async ({ id, target_points }) => { await queryClient.cancelQueries({ queryKey: ['profiles'] }); const previous = queryClient.getQueryData<Profile[]>(['profiles']); if (previous) queryClient.setQueryData(['profiles'], previous.map((p) => (p.id === id ? { ...p, target_points } : p))); return { previous }; }, onError: (_err, _vars, context) => { if (context?.previous) queryClient.setQueryData(['profiles'], context.previous); }, onSettled: () => { void queryClient.invalidateQueries({ queryKey: ['profiles'] }); setEditingTargetId(null); } });
 
-  const activeProfile = profiles.find((p) => p.id.toString() === activeProfileId);
+  // activeProfile is used implicitly via activeProfileId in the template below
+  void profiles.find((p) => p.id.toString() === activeProfileId);
   const nonArchivedCount = profiles.length;
 
   // Invalidate habits queries on profile switch

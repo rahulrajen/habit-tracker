@@ -366,13 +366,65 @@ export async function getDailyProgress(profileId: number) {
   const current = Number(row?.current ?? 0);
   const percentage = target > 0 ? Math.min((current / target) * 100, 100) : 0;
 
+  // Compute streak: number of consecutive days (including today) where target was met
+  const streak = await computeStreak(profileId, target, istToday);
+
   return {
     current,
     target,
     percentage: Math.round(percentage),
     isTargetMet: target > 0 && current >= target,
     hasZeroTarget: target === 0,
+    streak,
   };
+}
+
+/**
+ * Compute consecutive days the target was met, counting backwards from today.
+ */
+async function computeStreak(
+  profileId: number,
+  target: number,
+  today: string
+): Promise<number> {
+  if (target <= 0) return 0;
+
+  // Get daily sums for the last 60 days, ordered descending
+  const rows = await db
+    .select({
+      date: habitCompletions.completed_date,
+      total: sql<number>`COALESCE(SUM(${habits.points}), 0)`,
+    })
+    .from(habitCompletions)
+    .innerJoin(habits, eq(habitCompletions.habit_id, habits.id))
+    .where(eq(habitCompletions.profile_id, profileId))
+    .groupBy(habitCompletions.completed_date)
+    .orderBy(sql`${habitCompletions.completed_date} DESC`)
+    .limit(60);
+
+  let streak = 0;
+  // Build a map for fast lookup
+  const pointsByDate = new Map<string, number>();
+  for (const r of rows) {
+    pointsByDate.set(r.date, Number(r.total));
+  }
+
+  // Walk backwards from today
+  const cursor = new Date(today + 'T00:00:00');
+  // Walk backwards checking consecutive days (break when target not met)
+  let done = false;
+  while (!done) {
+    const dateStr = cursor.toISOString().split('T')[0];
+    const dayPoints = pointsByDate.get(dateStr) ?? 0;
+    if (dayPoints >= target) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    } else {
+      done = true;
+    }
+  }
+
+  return streak;
 }
 
 /**

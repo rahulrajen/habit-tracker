@@ -3,28 +3,29 @@
 @tailwind utilities;
 
 /* ============================================================================
-   Glass Theme Design Tokens — Originated in Habit Tracker for the ecosystem
+   Glass Theme Design Tokens — Enhanced Post-Go-Live
+   Deeper blur, brighter borders, gradient overlays for modern look
    ============================================================================ */
 
 :root {
-  /* Core glass surfaces */
-  --glass-bg: rgba(255, 255, 255, 0.08);
-  --glass-bg-strong: rgba(255, 255, 255, 0.12);
-  --glass-border: rgba(255, 255, 255, 0.15);
-  --glass-shadow: rgba(0, 0, 0, 0.25);
-  --glass-hover: rgba(255, 255, 255, 0.12);
-  --glass-active: rgba(255, 255, 255, 0.18);
+  /* Core glass surfaces — stronger opacity for depth */
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-bg-strong: rgba(255, 255, 255, 0.10);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  --glass-shadow: rgba(0, 0, 0, 0.30);
+  --glass-hover: rgba(255, 255, 255, 0.10);
+  --glass-active: rgba(255, 255, 255, 0.14);
 
   /* Accent palette */
-  --accent-primary: #6C63FF;
+  --accent-primary: #6366F1;
   --accent-success: #34D399;
   --accent-warning: #FBBF24;
   --accent-danger: #F87171;
 
   /* Surface palette */
-  --surface-dark: #0F172A;
-  --surface-card: #1E293B;
-  --surface-elevated: #334155;
+  --surface-dark: #0B0F1A;
+  --surface-card: #131827;
+  --surface-elevated: #1A2035;
 
   /* Animation timing */
   --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
@@ -47,46 +48,96 @@ html {
 }
 
 body {
-  background: linear-gradient(135deg, var(--surface-dark) 0%, var(--surface-card) 50%, var(--surface-dark) 100%);
+  background: #000000;
   color: #f8fafc;
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  position: relative;
+}
+
+/* iOS-style animated gradient background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 20% 10%, rgba(88, 28, 235, 0.35), transparent),
+    radial-gradient(ellipse 80% 60% at 80% 20%, rgba(219, 39, 66, 0.25), transparent),
+    radial-gradient(ellipse 70% 50% at 40% 80%, rgba(14, 165, 233, 0.30), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 80%, rgba(245, 158, 11, 0.20), transparent),
+    radial-gradient(ellipse 50% 50% at 10% 60%, rgba(16, 185, 129, 0.25), transparent);
+  pointer-events: none;
+  animation: bg-drift 30s ease-in-out infinite alternate;
+}
+
+/* Additional color layer for depth */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle 120px at 30% 40%, rgba(168, 85, 247, 0.20), transparent),
+    radial-gradient(circle 100px at 70% 30%, rgba(236, 72, 153, 0.15), transparent),
+    radial-gradient(circle 150px at 50% 70%, rgba(59, 130, 246, 0.18), transparent);
+  pointer-events: none;
+  animation: bg-drift 25s ease-in-out infinite alternate-reverse;
 }
 
 /* ============================================================================
-   Glass Card Utilities — Reusable across all modules
+   Glass Card Utilities — Enhanced with deeper blur and glow
    ============================================================================ */
 
+/* Enhanced iOS-style glass card */
 .glass-card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: background 0.2s var(--ease-smooth), border-color 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  transition:
+    background 0.3s var(--ease-smooth),
+    border-color 0.3s var(--ease-smooth),
+    box-shadow 0.3s var(--ease-smooth);
 }
 
 .glass-card:hover {
-  background: var(--glass-hover);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 40px var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.20);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
 }
 
 .glass-card--active {
-  background: var(--glass-active);
-  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(99, 102, 241, 0.30);
+  box-shadow:
+    0 0 30px rgba(99, 102, 241, 0.20),
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
 }
 
 .glass-card--strong {
-  background: var(--glass-bg-strong);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Nav bar variant — flatter, more transparent */
+nav .glass-card {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* ============================================================================
-   Animation Keyframes (Tailwind-compatible extensions)
+   Animation Keyframes
    ============================================================================ */
 
 @keyframes fadeIn {
@@ -110,8 +161,8 @@ body {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.3); }
-  50% { box-shadow: 0 0 0 8px rgba(108, 99, 255, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3); }
+  50% { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
 }
 
 @keyframes shimmer {
@@ -119,12 +170,33 @@ body {
   100% { background-position: 200% 0; }
 }
 
+@keyframes bg-drift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes slideDown {
+  0% { transform: translateY(-10px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
 /* ============================================================================
    Skeleton Loading Animation
    ============================================================================ */
 
 .skeleton {
-  background: linear-gradient(90deg, var(--glass-bg) 25%, var(--glass-bg-strong) 50%, var(--glass-bg) 75%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 8px;
@@ -144,12 +216,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.10);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.20);
 }
 
 /* ============================================================================
@@ -157,11 +229,11 @@ body {
    ============================================================================ */
 
 .progress-bar-fill {
-  transition: width 0.6s var(--ease-spring);
+  transition: width 0.7s var(--ease-spring);
 }
 
 /* ============================================================================
-   Touch-friendly tap targets (coarse pointer devices)
+   Touch-friendly tap targets
    ============================================================================ */
 
 @media (pointer: coarse) {
@@ -170,7 +242,6 @@ body {
     min-width: 44px;
   }
 
-  /* Larger touch targets for habit cards on mobile */
   .habit-card-touch {
     padding: 12px 16px;
   }
@@ -193,22 +264,65 @@ body {
 }
 
 /* ============================================================================
+   Responsive utilities for foldable devices (Samsung Galaxy Fold, etc.)
+   ============================================================================ */
+
+/* Ultra-small screens (folded state ~280-360px) */
+@media (max-width: 360px) {
+  html { font-size: 14px; }
+  
+  .min-h-screen { padding-left: 0.5rem; padding-right: 0.5rem; }
+  
+  .mx-auto { padding-left: 0.5rem; padding-right: 0.5rem; }
+  
+  /* Stack header elements vertically on folded screens */
+  header.flex-wrap { flex-wrap: wrap; }
+}
+
+/* Small mobile (~360-480px) */
+@media (max-width: 480px) {
+  html { font-size: 15px; }
+  
+  .glass-card { border-radius: 12px; }
+  
+  /* Tighter spacing on small screens */
+  .space-y-4 > * + * { margin-top: 0.75rem; }
+  .space-y-6 > * + * { margin-top: 1rem; }
+}
+
+/* Tablet (~480-768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  html { font-size: 16px; }
+  
+  .mx-auto { max-width: 100%; }
+}
+
+/* Animation utilities */
+.animate-slideDown {
+  animation: slideDown 0.3s var(--ease-spring);
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.4s var(--ease-spring);
+}
+
+/* ============================================================================
    Component-specific glass styles
    ============================================================================ */
 
 /* Habit card glass effect */
 .habit-card-glass {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 12px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Profile switcher button */
 .profile-btn {
   background: transparent;
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 10px;
   padding: 8px 14px;
   color: #e2e8f0;
@@ -217,39 +331,49 @@ body {
 }
 
 .profile-btn:hover, .profile-btn[aria-selected='true'] {
-  background: var(--glass-bg-strong);
+  background: rgba(255, 255, 255, 0.08);
   border-color: var(--accent-primary);
   color: #ffffff;
 }
 
-/* Input fields */
+/* Enhanced iOS-style input fields */
 .glass-input {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
   padding: 10px 14px;
   color: #f8fafc;
   font-size: 14px;
-  transition: border-color 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth);
+  transition:
+    background 0.2s var(--ease-smooth),
+    border-color 0.2s var(--ease-smooth),
+    box-shadow 0.2s var(--ease-smooth);
 }
 
 .glass-input:focus {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(99, 102, 241, 0.50);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.20), 0 0 20px rgba(99, 102, 241, 0.10);
 }
 
 .glass-input::placeholder {
   color: rgba(255, 255, 255, 0.35);
 }
 
+/* Button glass style */
+button.rounded-lg {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
 /* Chart tooltip glass theme */
 .chart-tooltip-glass {
-  background: var(--glass-bg-strong);
-  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 10px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: 8px 12px;
   font-size: 13px;
   color: #f8fafc;

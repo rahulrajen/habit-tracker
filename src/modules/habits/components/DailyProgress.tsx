@@ -1,8 +1,7 @@
 'use client';
 
 // ============================================================================
-// DailyProgress — Progress bar showing current points vs target
-// Phase 3 scope: renders progress bar with zero-target guard
+// DailyProgress — Elegant progress bar + streak display (no frame)
 // ============================================================================
 
 import { useQuery } from '@tanstack/react-query';
@@ -13,6 +12,7 @@ interface ProgressData {
   percentage: number;
   isTargetMet: boolean;
   hasZeroTarget: boolean;
+  streak: number;
 }
 
 interface DailyProgressProps {
@@ -29,60 +29,81 @@ export default function DailyProgress({ profileId }: DailyProgressProps) {
   const { data, isLoading } = useQuery({
     queryKey: ['progress', profileId],
     queryFn: () => fetchProgress(profileId),
-    refetchInterval: 15000, // Sync with habit polling interval
+    refetchInterval: 15000,
   });
 
   if (isLoading) {
-    return <div className="h-8 animate-pulse rounded bg-surface-light/30" />;
+    return (
+      <div className="px-4 py-3">
+        <div className="skeleton h-2 w-24 rounded-full mb-2" />
+        <div className="skeleton h-1.5 w-full rounded-full" />
+      </div>
+    );
   }
 
   if (!data) return null;
 
-  // Zero-target guard: show message instead of broken bar
   if (data.hasZeroTarget) {
     return (
-      <div className="rounded-xl border border-dashed border-glass-border bg-surface-light/20 p-4">
-        <p className="text-sm text-gray-400 italic">No target set. Set a daily point target in your profile settings.</p>
+      <div className="px-4 py-3">
+        <p className="text-xs text-gray-500/80">
+          Set a daily point target in Settings.
+        </p>
       </div>
     );
   }
 
   const barWidth = Math.min(data.percentage, 100);
   const isComplete = data.isTargetMet;
+  const streak = data.streak ?? 0;
 
   return (
-    <div className="rounded-xl border border-dashed border-glass-border bg-surface-light/20 p-4">
-      {/* Header: title + percentages */}
+    <div className="px-4 py-3">
+      {/* Header: label + streak + points */}
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-300">Daily Progress</span>
-        <span className={`text-sm font-semibold ${isComplete ? 'text-green-400' : 'text-accent-blue'}`}>
-          {data.current} / {data.target} points ({data.percentage}%)
-        </span>
+        <span className="text-xs font-medium text-white/60">Progress</span>
+        <div className="flex items-center gap-2">
+          {streak > 0 && (
+            <span className="inline-flex items-center rounded-full bg-orange-500/15 px-2 py-0.5 text-[10px] font-semibold text-orange-400">
+              🔥 {streak}
+            </span>
+          )}
+          <span
+            className={`text-xs font-bold tabular-nums ${
+              isComplete ? 'text-green-400' : 'text-white/80'
+            }`}
+          >
+            {data.current}/{data.target}
+          </span>
+        </div>
       </div>
 
-      {/* Progress bar track */}
-      <div className="h-3 w-full overflow-hidden rounded-full bg-gray-700">
-        {/* Progress bar fill with gradient */}
+      {/* Progress bar track — no border, no background card */}
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
         <div
-          className={`h-full rounded-full transition-all duration-500 ease-out ${isComplete ? 'bg-green-500' : 'bg-gradient-to-r from-accent-blue to-purple-500'}`}
+          className={`h-full rounded-full transition-all duration-700 ease-out ${
+            isComplete
+              ? 'bg-gradient-to-r from-green-400 to-emerald-400'
+              : 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500'
+          }`}
           style={{ width: `${barWidth}%` }}
         />
       </div>
 
-      {/* Milestone markers */}
-      <div className="mt-1 flex justify-between text-xs text-gray-500">
-        <span>0</span>
-        <span>{Math.round(data.target * 0.25)}</span>
-        <span>{Math.round(data.target * 0.5)}</span>
-        <span>{Math.round(data.target * 0.75)}</span>
-        <span>{data.target}</span>
+      {/* Percentage */}
+      <div className="mt-1.5 text-right">
+        <span className={`text-[10px] font-medium ${isComplete ? 'text-green-400/80' : 'text-white/40'}`}>
+          {Math.round(data.percentage)}%
+        </span>
       </div>
 
-      {/* Target met celebration text */}
+      {/* Target met celebration */}
       {isComplete && (
-        <p className="mt-2 text-center text-sm font-medium text-green-400">
-          &#127881; Target reached! Great job!
-        </p>
+        <div className="mt-2 text-center">
+          <p className="text-xs font-medium text-green-400/90">
+            ✨ Daily target reached!{streak > 0 ? ` ${streak} day streak!` : ''}
+          </p>
+        </div>
       )}
     </div>
   );

@@ -22,8 +22,6 @@ import {
   archiveProfile,
 } from '../actions';
 
-/** Unique marker so cleanup only touches rows created by THIS test suite. */
-const PROFILE_MARKER = 'profiles-test-suite';
 
 let testPool: Pool | null = null;
 

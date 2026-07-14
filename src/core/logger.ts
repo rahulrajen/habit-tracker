@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // ============================================================================
 // Tagged Logger — tagged by module id for traceability
 // Both modules (profiles, habits) import this via @core/logger
@@ -49,6 +50,7 @@ function _log(entry: LogEntry): void {
 
   const prefix = `[${entry.timestamp}] [${entry.level.toUpperCase()}] [${entry.module}]`;
 
+  // eslint-disable-next-line no-console
   switch (entry.level) {
     case 'error':
       console.error(prefix, entry.message, entry.data !== undefined ? entry.data : '');

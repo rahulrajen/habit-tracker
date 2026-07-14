@@ -4,11 +4,11 @@
 //         archiveHabit, toggleCompletion, reorderHabits
 // ============================================================================
 
-import { describe, it, test, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { db } from '@core/db';
 import { profiles } from '@core/schema';
 import { habits, habitCompletions } from '../schema';
-import { eq, isNull } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import {
   getHabitsByProfile,
   getHabitById,

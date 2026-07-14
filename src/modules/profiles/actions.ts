@@ -7,7 +7,7 @@ import { profiles } from '@core/schema';
 import { createNotFoundError, createLimitExceededError, createValidationError } from '@core/errors';
 import { db } from '@core/db';
 import { z } from 'zod';
-import { eq, count, isNull, isNotNull, desc } from 'drizzle-orm';
+import { eq, count, isNull, desc } from 'drizzle-orm';
 
 // ---------------------------------------------------------------------------
 // Zod Schemas — validation at every boundary

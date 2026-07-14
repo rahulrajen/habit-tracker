@@ -8,6 +8,7 @@ declare global {
     only: (name: string, fn: () => Promise<void>) => void;
   };
   const test: typeof it;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const expect: <T = any>(value: T) => ReturnType<import('vitest').expect<T>>;
   const beforeEach: (fn: () => Promise<void> | void) => void;
 }

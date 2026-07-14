@@ -44,8 +44,6 @@ async function seedCompletions(
   for (let dayOffset = 1; dayOffset <= 6; dayOffset++) {
     const completionDate = new Date(now);
     completionDate.setDate(completionDate.getDate() - dayOffset);
-    const dateStr = completionDate.toISOString().split('T')[0];
-
     // IST offset: add 5.5 hours to get IST date
     const istDate = new Date(completionDate.getTime() + 5.5 * 60 * 60 * 1000);
     const istDateStr = istDate.toISOString().split('T')[0];
@@ -75,7 +73,8 @@ async function seedCompletions(
     'SELECT COUNT(*) FROM habit_completions hc JOIN habits h ON h.id = hc.habit_id WHERE h.profile_id = $1',
     [profileId]
   );
-  console.log(`  Completions seeded: ${total.rows[0].count}`);
+   // eslint-disable-next-line no-console
+   console.log(`  Completions seeded: ${total.rows[0].count}`);
 }
 
 /** Insert sample profiles (idempotent via ON CONFLICT) */
@@ -134,15 +133,17 @@ async function seedProfiles(client: PoolClient): Promise<Map<number, number[]>> 
     }
   }
 
-  const count = await client.query('SELECT COUNT(*) FROM profiles WHERE archived_at IS NULL');
-  console.log(`  Profiles seeded: ${count.rows[0].count}`);
+   const count = await client.query('SELECT COUNT(*) FROM profiles WHERE archived_at IS NULL');
+   // eslint-disable-next-line no-console
+   console.log(`  Profiles seeded: ${count.rows[0].count}`);
 
   return profileIds;
 }
 
 /** Main entry point */
 async function main() {
-  console.log('Seeding database...');
+// eslint-disable-next-line no-console
+console.log('Seeding database...');
   const pool = createPool();
 
   try {
@@ -162,6 +163,7 @@ async function main() {
       await seedProfiles(client);
 
       await client.query('COMMIT');
+      // eslint-disable-next-line no-console
       console.log('Seed complete.');
     } catch (err) {
       await client.query('ROLLBACK');
@@ -175,6 +177,7 @@ async function main() {
 }
 
 main().catch((err) => {
+  // eslint-disable-next-line no-console
   console.error('Seed failed:', err);
   process.exit(1);
 });

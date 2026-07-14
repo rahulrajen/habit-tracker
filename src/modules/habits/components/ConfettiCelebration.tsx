@@ -10,7 +10,6 @@ import confetti from 'canvas-confetti';
 
 interface ConfettiCelebrationProps {
   isTargetMet: boolean;
-  wasPreviouslyBelowTarget?: boolean; // Track if we were below target before this render
   profileId: string;
 }
 
@@ -30,7 +29,6 @@ function getConfettiKey(profileId: string): string {
 
 export default function ConfettiCelebration({
   isTargetMet,
-  wasPreviouslyBelowTarget = false,
   profileId,
 }: ConfettiCelebrationProps) {
   const hasFiredRef = useRef(false);

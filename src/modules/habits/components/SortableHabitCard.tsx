@@ -7,7 +7,6 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useCallback, useRef } from 'react';
 
 interface HabitItem {
   id: number;
@@ -25,63 +24,11 @@ export interface SortableHabitCardProps {
 }
 
 /**
- * Sortable habit card component.
- * Uses @dnd-kit/useSortable for drag handles, but delegates the visual rendering
- * to a ref-forwarded inner component so tap-to-complete still works via click.
- */
-const SortableHabitCardContent = ({ habit, onToggle }: SortableHabitCardProps) => {
-  const isCompleted = habit.is_completed_today;
-
-  return (
-    <div
-      className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left ${
-        isCompleted
-          ? 'border-green-500/30 bg-green-500/10'
-          : 'border-glass-border bg-glass/30 hover:border-accent-blue/30'
-      }`}
-    >
-      {/* Drag handle (visible only on non-touch devices via CSS in production) */}
-      <div className="flex h-6 w-6 flex-shrink-0 cursor-grab items-center justify-center rounded-full border border-gray-600 active:cursor-grabbing">
-        <span className="text-xs text-gray-400">&#9776;</span>
-      </div>
-
-      {/* Completion indicator */}
-      <div
-        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border ${
-          isCompleted ? 'border-green-400 bg-green-400 text-white' : 'border-gray-500'
-        }`}
-      >
-        {isCompleted && <span className="text-sm">&#10003;</span>}
-      </div>
-
-      {/* Emoji */}
-      <span className="text-xl">{habit.emoji}</span>
-
-      {/* Text + Points */}
-      <div className="flex-1">
-        <span
-          className={`block text-sm ${isCompleted ? 'line-through text-gray-400' : 'text-gray-100'}`}
-        >
-          {habit.text}
-        </span>
-        <span className="text-xs text-accent-blue">{habit.points} pts</span>
-      </div>
-    </div>
-  );
-};
-
-// Export the inner component so it can be tested independently if needed
-export { SortableHabitCardContent };
-
-/**
- * Main sortable card wrapper.
- * Uses useSortable hook to make the inner content draggable, while preserving
- * tap-to-complete behavior via click on the card body.
+ * Sortable habit card with drag handle using @dnd-kit/useSortable.
+ * Tap-to-complete works via click on the card body.
  */
 export function SortableHabitCard({ habit, onToggle }: SortableHabitCardProps) {
   const {
-    attributes,
-    listeners,
     setNodeRef,
     transform,
     transition,
@@ -95,9 +42,47 @@ export function SortableHabitCard({ habit, onToggle }: SortableHabitCardProps) {
     zIndex: isDragging ? 1000 : undefined,
   };
 
+  const isCompleted = habit.is_completed_today;
+
   return (
     <div ref={setNodeRef} style={style}>
-      <SortableHabitCardContent habit={habit} onToggle={() => onToggle(habit.id)} />
+      <div
+        onClick={() => onToggle(habit.id)}
+        className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left ${
+          isCompleted
+            ? 'border-green-500/30 bg-green-500/10'
+            : 'border-white/10 bg-white/5 hover:border-indigo-400/40 hover:bg-white/10'
+        }`}
+      >
+        {/* Drag handle */}
+        <div className="flex h-6 w-6 flex-shrink-0 cursor-grab items-center justify-center rounded-full border border-white/10 active:cursor-grabbing">
+          <span className="text-xs text-gray-500">&#9776;</span>
+        </div>
+
+        {/* Completion indicator */}
+        <div
+          className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border transition-colors ${
+            isCompleted
+              ? 'border-green-400 bg-green-400 text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]'
+              : 'border-white/20'
+          }`}
+        >
+          {isCompleted && <span className="text-sm">&#10003;</span>}
+        </div>
+
+        {/* Emoji */}
+        <span className="text-xl">{habit.emoji}</span>
+
+        {/* Text + Points */}
+        <div className="flex-1">
+          <span
+            className={`block text-sm ${isCompleted ? 'line-through text-gray-500' : 'text-gray-100'}`}
+          >
+            {habit.text}
+          </span>
+          <span className="text-xs text-indigo-400">{habit.points} pts</span>
+        </div>
+      </div>
     </div>
   );
 }
