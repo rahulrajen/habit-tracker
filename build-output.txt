@@ -1,0 +1,144 @@
+
+> habit-tracker@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/10) ...
+   Generating static pages (2/10) 
+   Generating static pages (4/10) 
+[2026-07-13T03:52:58.631Z] [ERROR] [core/health] Database health check failed:  AggregateError [ECONNREFUSED]: 
+    at D:\AI Playground\Habit-tracker\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async c (D:\AI Playground\Habit-tracker\.next\server\app\api\health\route.js:1:2093)
+    at async i (D:\AI Playground\Habit-tracker\.next\server\app\api\health\route.js:1:1145)
+    at async D:\AI Playground\Habit-tracker\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:38411
+    at async e_.execute (D:\AI Playground\Habit-tracker\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:27880)
+    at async e_.handle (D:\AI Playground\Habit-tracker\node_modules\next\dist\compiled\next-server\app-route.runtime.prod.js:6:39943)
+    at async exportAppRoute (D:\AI Playground\Habit-tracker\node_modules\next\dist\export\routes\app-route.js:77:26)
+    at async exportPageImpl (D:\AI Playground\Habit-tracker\node_modules\next\dist\export\worker.js:175:20)
+    at async Span.traceAsyncFn (D:\AI Playground\Habit-tracker\node_modules\next\dist\trace\trace.js:154:20) {
+  code: 'ECONNREFUSED',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:5432
+        at createConnectionError (node:net:1686:14)
+        at afterConnectMultiple (node:net:1716:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 5432
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:5432
+        at createConnectionError (node:net:1686:14)
+        at afterConnectMultiple (node:net:1716:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 5432
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at D:\AI Playground\Habit-tracker\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async D:\AI Playground\Habit-tracker\.next\server\chunks\29.js:1:5238
+    at async c (D:\AI Playground\Habit-tracker\.next\server\app\page.js:1:6802) {
+  code: 'ECONNREFUSED',
+  digest: '3538071020',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:5432
+        at createConnectionError (node:net:1686:14)
+        at afterConnectMultiple (node:net:1716:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 5432
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:5432
+        at createConnectionError (node:net:1686:14)
+        at afterConnectMultiple (node:net:1716:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 5432
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at D:\AI Playground\Habit-tracker\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async D:\AI Playground\Habit-tracker\.next\server\chunks\29.js:1:5238
+    at async c (D:\AI Playground\Habit-tracker\.next\server\app\page.js:1:6802) {
+  code: 'ECONNREFUSED',
+  digest: '3538071020',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:5432
+        at createConnectionError (node:net:1686:14)
+        at afterConnectMultiple (node:net:1716:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 5432
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:5432
+        at createConnectionError (node:net:1686:14)
+        at afterConnectMultiple (node:net:1716:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 5432
+    }
+  ]
+}
+AggregateError [ECONNREFUSED]: 
+    at D:\AI Playground\Habit-tracker\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async D:\AI Playground\Habit-tracker\.next\server\chunks\29.js:1:5238
+    at async c (D:\AI Playground\Habit-tracker\.next\server\app\page.js:1:6802) {
+  code: 'ECONNREFUSED',
+  digest: '3538071020',
+  [errors]: [
+    Error: connect ECONNREFUSED ::1:5432
+        at createConnectionError (node:net:1686:14)
+        at afterConnectMultiple (node:net:1716:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '::1',
+      port: 5432
+    },
+    Error: connect ECONNREFUSED 127.0.0.1:5432
+        at createConnectionError (node:net:1686:14)
+        at afterConnectMultiple (node:net:1716:16) {
+      errno: -4078,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 5432
+    }
+  ]
+}
+   Generating static pages (7/10) 
+
+Error occurred prerendering page "/". Read more: https://nextjs.org/docs/messages/prerender-error
+
+AggregateError [ECONNREFUSED]: 
+    at D:\AI Playground\Habit-tracker\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async D:\AI Playground\Habit-tracker\.next\server\chunks\29.js:1:5238
+    at async c (D:\AI Playground\Habit-tracker\.next\server\app\page.js:1:6802)
+ ✓ Generating static pages (10/10)
+
+> Export encountered errors on following paths:
+	/page: /
