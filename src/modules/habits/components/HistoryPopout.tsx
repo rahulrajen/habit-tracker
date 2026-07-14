@@ -74,27 +74,32 @@ function HistoryStats({ profileId }: { profileId: string }) {
   return (
     <div className="grid grid-cols-3 gap-3 mb-2">
       {/* Current streak */}
-      <StatCard label="Streak" queryKey={['streak', profileId]} fetchFn={async (_id) => {
-        const res = await fetch(`/api/habits/progress?profileId=${_id}`);
-        if (!res.ok) return 0;
+      <StatCard label="Streak" queryKey={['historyPopout_streak', profileId]} fetchFn={async () => {
+        const res = await fetch(`/api/habits/progress?profileId=${profileId}`);
+        if (!res.ok) return '—';
         const data = await res.json();
-        return `🔥 ${data.streak ?? 0}`;
+        // Ensure we extract just the number from the response object
+        const streakVal = typeof data?.streak === 'number' ? data.streak : 0;
+        return `🔥 ${streakVal}`;
       }} />
 
       {/* Today's progress */}
-      <StatCard label="Today" queryKey={['progress', profileId]} fetchFn={async (_id) => {
-        const res = await fetch(`/api/habits/progress?profileId=${_id}`);
+      <StatCard label="Today" queryKey={['historyPopout_today', profileId]} fetchFn={async () => {
+        const res = await fetch(`/api/habits/progress?profileId=${profileId}`);
         if (!res.ok) return '—';
         const data = await res.json();
-        return `${data.current ?? 0}/${data.target ?? 0}`;
+        const cur = typeof data?.current === 'number' ? data.current : 0;
+        const tgt = typeof data?.target === 'number' ? data.target : 0;
+        return `${cur}/${tgt}`;
       }} />
 
       {/* Total habits */}
-      <StatCard label="Habits" queryKey={['habits', profileId]} fetchFn={async (_id) => {
-        const res = await fetch(`/api/habits?profileId=${_id}`);
+      <StatCard label="Habits" queryKey={['historyPopout_habits', profileId]} fetchFn={async () => {
+        const res = await fetch(`/api/habits?profileId=${profileId}`);
         if (!res.ok) return 0;
         const data = await res.json();
-        return Array.isArray(data) ? data.length : 0;
+        const count = Array.isArray(data) ? data.length : 0;
+        return String(count);
       }} />
     </div>
   );
@@ -102,29 +107,31 @@ function HistoryStats({ profileId }: { profileId: string }) {
 
 // ---------------------------------------------------------------------------
 // StatCard — Generic stat display with query fetch
+// Ensures value is always a string before rendering
 // ---------------------------------------------------------------------------
 
 interface StatCardProps {
   label: string;
   queryKey: string[];
-  fetchFn: (id: string) => Promise<string | number>;
+  fetchFn: () => Promise<string | number>;
 }
 
 function StatCard({ label, queryKey, fetchFn }: StatCardProps) {
   const { data } = useQuery({
     queryKey,
-    queryFn: () => fetchFn(_getProfileId(queryKey)),
+    queryFn: fetchFn,
     refetchInterval: 15000,
   });
+
+  // Coerce to string for safe React rendering
+  const displayValue = typeof data === 'object' && data !== null
+    ? JSON.stringify(data)
+    : String(data ?? '—');
 
   return (
     <div className="rounded-xl border border-white/8 bg-white/5 px-3 py-2 text-center">
       <p className="mb-0.5 text-[10px] uppercase tracking-wider text-gray-500">{label}</p>
-      <p className="text-sm font-semibold text-gray-200 tabular-nums">{data ?? '—'}</p>
+      <p className="text-sm font-semibold text-gray-200 tabular-nums">{displayValue}</p>
     </div>
   );
-}
-
-function _getProfileId(key: string[]): string {
-  return key[key.length - 1] as string;
 }
