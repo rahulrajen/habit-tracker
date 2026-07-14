@@ -25,7 +25,6 @@ import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type React from 'react';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -127,7 +126,7 @@ function useAppSensors() {
 }
 
 // ---------------------------------------------------------------------------
-// SortableHabitCard
+// SortableHabitCard — uses useSortable for dnd-kit drag support
 // ---------------------------------------------------------------------------
 
 function SortableHabitCard({
@@ -158,7 +157,6 @@ function SortableHabitCard({
   return (
     <div ref={setNodeRef} style={style}>
       <motion.button
-        layout
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         onClick={() => onToggle(habit.id)}
@@ -170,7 +168,8 @@ function SortableHabitCard({
             : 'border-white/10 bg-white/5 hover:border-indigo-400/40 hover:bg-white/10 hover:shadow-[0_4px_20px_rgba(99,102,241,0.15)]'
         }`}
       >
-        <div className="flex h-6 w-6 flex-shrink-0 cursor-grab items-center justify-center rounded-full border border-white/10 active:cursor-grabbing">
+        {/* Drag handle — hidden by default, visible on hover (desktop) or long-press */}
+        <div className="flex h-6 w-6 flex-shrink-0 cursor-grab items-center justify-center rounded-full border border-white/10 opacity-0 active:cursor-grabbing hover:opacity-30 md:hidden">
           <span className="text-xs text-gray-500">&#9776;</span>
         </div>
         <div
@@ -240,27 +239,35 @@ export default function HabitBoard({ profileId }: HabitBoardProps) {
     refetchOnWindowFocus: true,
   });
 
-  // Fetch progress for confetti
+  // Fetch progress for confetti and progress bar
   const { data: progress } = useQuery({
     queryKey: ['progress', profileId],
     queryFn: () => fetch(`/api/habits/progress?profileId=${profileId}`).then((r) => r.json()),
     refetchInterval: (!isTabVisible || isDragging) ? false : 15000,
   });
 
-  // Confetti state tracking
-  const [prevProgressBelowTarget, setPrevProgressBelowTarget] = useState(true);
+  // Confetti transition tracking — useState for confetti trigger (causes re-render when set),
+  // useRef for previous state (persists across renders without triggering re-renders)
   const [currentProgressIsMet, setCurrentProgressIsMet] = useState(false);
+  const prevTargetMetRef = useRef<boolean | null>(null);
 
+  // Detect false→true transitions of target met status
   useEffect(() => {
-    if (!progress) return;
-    const isMet = progress.isTargetMet && !progress.hasZeroTarget;
-    if (prevProgressBelowTarget && isMet) {
+    if (progress == null) return;
+
+    const nowMet = progress.isTargetMet && !progress.hasZeroTarget;
+
+    // Detect transition: below target → at/above target (habit just completed, crossing threshold)
+    if (prevTargetMetRef.current === false && nowMet === true) {
       setCurrentProgressIsMet(true);
-    } else if (!isMet) {
-      setPrevProgressBelowTarget(false);
+    } else if (!nowMet) {
+      // Reset when below target — allows next transition to fire
       setCurrentProgressIsMet(false);
     }
-  }, [progress, prevProgressBelowTarget]);
+
+    // Update ref (no re-render triggered)
+    prevTargetMetRef.current = nowMet;
+  }, [progress]);
 
   // Toggle completion mutation
   const toggleMutation = useMutation({

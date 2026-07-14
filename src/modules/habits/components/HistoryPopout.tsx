@@ -1,8 +1,9 @@
 'use client';
 
 // ============================================================================
-// HistoryPopout — iOS-style floating panel that slides in from right
+// HistoryPopout — iOS-style floating modal panel
 // Contains streak stats + 30-day history chart
+// Glassmorphic design: scale/fade pop-in instead of slide from right
 // ============================================================================
 
 import { useQuery } from '@tanstack/react-query';
@@ -26,16 +27,16 @@ export default function HistoryPopout({ profileId, show, onClose }: HistoryPopou
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-[199] bg-black/20"
+            className="fixed inset-0 z-[199] bg-black/30 backdrop-blur-sm"
           />
 
-          {/* Popout panel — slides from right */}
+          {/* Popout panel — iOS-style center pop */}
           <motion.div
-            initial={{ x: 420, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 420, opacity: 0 }}
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300, mass: 0.8 }}
-            className="fixed right-4 top-20 z-[200] w-[380px] max-w-[calc(100vw-2rem)] rounded-2xl border border-white/12 bg-gray-900/85 p-5 shadow-2xl backdrop-blur-2xl"
+            className="fixed left-1/2 top-20 z-[200] w-[400px] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-2xl"
           >
             {/* Close button */}
             <button

@@ -1,13 +1,13 @@
 'use client';
 
 // ============================================================================
-// TopBar — Responsive header with date, profile dropdown, settings, add-habit, streak
-// Designed for Samsung Galaxy Fold (280px–768px) and up
+// TopBar — Responsive header with date, profile display, settings, add-habit, streak
+// Post-Go-Live: Static profile display (no dropdown), icon-only action buttons
 // ============================================================================
 
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -83,8 +83,8 @@ export default function TopBar({ currentProfileId, onAddHabit, onShowHistory, sh
       // Ignore creation errors — show nothing for now
     }
   }
+
   const router = useRouter();
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['profiles'],
@@ -98,63 +98,18 @@ export default function TopBar({ currentProfileId, onAddHabit, onShowHistory, sh
     staleTime: 60000,
   });
 
-  const handleProfileChange = useCallback((id: string) => {
-    setShowProfileDropdown(false);
-    router.push(`/profiles/${id}`);
-  }, [router]);
-
-  const currentProfile = profiles.find((p) => p.id.toString() === currentProfileId);
+  const currentProfile = profiles.find((p: Profile) => p.id.toString() === currentProfileId);
 
   return (
     <header className="w-full">
       {/* Top navigation — frosted glass bar */}
       <nav className="glass-card flex items-center justify-between px-4 py-2.5 backdrop-blur-xl">
-        {/* Left: Profile selector */}
-        <div className="relative">
-          <button
-            onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-            className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-all hover:bg-white/10"
-            aria-label="Select profile"
-          >
-            {currentProfile?.emoji && <span className="text-lg">{currentProfile.emoji}</span>}
-            <span className="text-sm font-medium text-gray-100 max-[480px]:hidden">
-              {currentProfile?.name || 'Profile'}
-            </span>
-            <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          {/* Dropdown menu */}
-          {showProfileDropdown && (
-            <>
-              {/* Backdrop */}
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setShowProfileDropdown(false)}
-              />
-              {/* Menu */}
-              <div className="absolute left-0 z-[100] mt-1 min-w-[200px] rounded-xl border border-white/20 bg-gray-900/90 py-2 backdrop-blur-2xl shadow-2xl">
-                {profiles.map((profile) => (
-                  <button
-                    key={profile.id}
-                    onClick={() => handleProfileChange(profile.id.toString())}
-                    className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm transition-all hover:bg-white/10 ${
-                      profile.id.toString() === currentProfileId
-                        ? 'text-indigo-300'
-                        : 'text-gray-200'
-                    }`}
-                  >
-                    <span className="text-base">{profile.emoji}</span>
-                    <span className="flex-1">{profile.name}</span>
-                    {profile.id.toString() === currentProfileId && (
-                      <span className="text-xs text-indigo-400">Active</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+        {/* Left: Active profile display (static, no dropdown) */}
+        <div className="flex items-center gap-2">
+          {currentProfile?.emoji && <span className="text-lg">{currentProfile.emoji}</span>}
+          <span className="text-sm font-medium text-gray-100">
+            {currentProfile?.name || 'Profile'}
+          </span>
         </div>
 
         {/* Right: Actions */}
@@ -166,41 +121,35 @@ export default function TopBar({ currentProfileId, onAddHabit, onShowHistory, sh
             </span>
           )}
 
-          {/* History button */}
+          {/* History button — icon only, larger */}
           <button
             onClick={() => onShowHistory?.()}
-            className="rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all border-white/10 bg-white/5 text-gray-400 hover:border-white/20 hover:text-white"
+            className="rounded-lg border border-white/10 bg-white/5 p-2 text-gray-400 hover:border-white/20 hover:text-white transition-all"
             aria-label="View history"
           >
-            <span className="flex items-center gap-1">
-              <span>📊</span>
-              <span className="max-[480px]:hidden">History</span>
-            </span>
+            <span className="text-xl">📊</span>
           </button>
 
-          {/* Add Habit button — icon only on small screens */}
+          {/* Add Habit button — icon only */}
           <button
             onClick={onAddHabit}
-            className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all ${
+            className={`rounded-lg border p-2 transition-all ${
               showCreateForm
                 ? 'border-indigo-400/40 bg-indigo-500/10 text-indigo-300'
                 : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20 hover:text-white'
-            } ${showCreateForm ? '' : 'max-[480px]:px-2 max-[480px]:py-1.5'}`}
+            }`}
             aria-label="Add habit"
           >
-            <span className="flex items-center gap-1">
-              <span>&#43;</span>
-              <span className="max-[480px]:hidden">Habit</span>
-            </span>
+            <span className="text-xl">➕</span>
           </button>
 
-          {/* Settings — icon only on small screens */}
+          {/* Settings — icon only */}
           <button
             onClick={() => router.push(`/profiles/${currentProfileId}/settings`)}
-            className="rounded-lg border border-white/10 bg-white/5 p-1.5 text-gray-400 hover:border-white/20 hover:text-white transition-all"
+            className="rounded-lg border border-white/10 bg-white/5 p-2 text-gray-400 hover:border-white/20 hover:text-white transition-all"
             aria-label="Settings"
           >
-            <span className="text-base">&#9881;&#65039;</span>
+            <span className="text-xl">⚙️</span>
           </button>
         </div>
       </nav>

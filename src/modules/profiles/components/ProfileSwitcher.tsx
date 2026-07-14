@@ -8,6 +8,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const STORAGE_KEY = 'habit-tracker-active-profile-id';
@@ -67,6 +68,7 @@ async function updateTarget(id: number, target_points: number): Promise<Profile>
 
 export default function ProfileSwitcher() {
   const router = useRouter();
+  const params = useParams();
   const queryClient = useQueryClient();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingTargetId, setEditingTargetId] = useState<number | null>(null);
@@ -79,12 +81,11 @@ export default function ProfileSwitcher() {
   const [activeProfileId, setActiveProfileId] = useState<string | null>(null);
 
   useEffect(() => {
-    const hashId = window.location.pathname.split('/profiles/')[1];
-    if (hashId) {
-      setActiveProfileId(hashId);
-      try { localStorage.setItem(STORAGE_KEY, hashId); } catch { /* noop */ }
+    if (params.id) {
+      setActiveProfileId(params.id as string);
+      try { localStorage.setItem(STORAGE_KEY, params.id as string); } catch { /* noop */ }
     }
-  }, []);
+  }, [params.id]);
 
   const { data: profiles = [], isLoading, error } = useQuery({ queryKey: ['profiles'], queryFn: fetchProfiles });
 
