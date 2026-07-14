@@ -48,11 +48,12 @@ async function fetchStreak(profileId: string): Promise<StreakData> {
 interface TopBarProps {
   currentProfileId: string;
   onAddHabit: () => void;
+  onShowHistory?: () => void;
   showCreateForm?: boolean;
   onCreateFormCancel?: () => void;
 }
 
-export default function TopBar({ currentProfileId, onAddHabit, showCreateForm, onCreateFormCancel }: TopBarProps) {
+export default function TopBar({ currentProfileId, onAddHabit, onShowHistory, showCreateForm, onCreateFormCancel }: TopBarProps) {
   const [newHabitText, setNewHabitText] = useState('');
   const [newHabitEmoji, setNewHabitEmoji] = useState('\u{1F4AA}');
   const [newHabitPoints, setNewHabitPoints] = useState<number>(1);
@@ -164,6 +165,18 @@ export default function TopBar({ currentProfileId, onAddHabit, showCreateForm, o
               &#128293; {streakData.streak}
             </span>
           )}
+
+          {/* History button */}
+          <button
+            onClick={() => onShowHistory?.()}
+            className="rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all border-white/10 bg-white/5 text-gray-400 hover:border-white/20 hover:text-white"
+            aria-label="View history"
+          >
+            <span className="flex items-center gap-1">
+              <span>📊</span>
+              <span className="max-[480px]:hidden">History</span>
+            </span>
+          </button>
 
           {/* Add Habit button — icon only on small screens */}
           <button
