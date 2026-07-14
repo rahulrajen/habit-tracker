@@ -1,21 +1,17 @@
-'use client';
-
 // ============================================================================
-// /profiles/[id] — Profile Detail Page
+// /profiles/[id] — Server component: Profile Detail Page
 // Shows profile switcher header + habit board for the selected profile.
 // Phase 2: embeds HabitBoard (completed/active cards, tap-to-complete).
 // Phase 3: adds progress bar, confetti, history chart here.
 // Phase 4: wraps modules in error boundaries for isolation.
 // ============================================================================
 
-import { use } from 'react';
 import ProfileSwitcher from '@modules/profiles/components/ProfileSwitcher';
 import HabitBoard from '@modules/habits/components/HabitBoard';
 import ModuleErrorBoundary from '@/core/error-boundary';
 
-export default function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
-  const resolved = use(params);
-  const profileId = resolved.id;
+export default function ProfilePage({ params }: { params: { id: string } }) {
+  const profileId = params.id;
 
   return (
     <div className="min-h-screen bg-surface-dark px-4 py-8">
