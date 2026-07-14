@@ -1,0 +1,120 @@
+{
+  "app": "TMag Habit Tracker",
+  "version": "0.1.0",
+  "lastUpdated": "2026-07-12T17:36:00+08:00",
+  "completedPhases": [
+    "Phase 0 — Setup & scaffolding",
+    "Phase 1 — Core infrastructure + profiles",
+    "Phase 2 — Habits CRUD, reorder, completions",
+    "Phase 3 — Progress bar, confetti, history chart, polling enhancements",
+    "Phase 4 — Polish & local hardening"
+  ],
+  "frontend": {
+    "framework": "Next.js 14+ (App Router)",
+    "language": "TypeScript (strict mode)",
+    "styling": "Tailwind CSS + glass-theme design tokens",
+    "stateManagement": "@tanstack/react-query (polling, optimistic updates)",
+    "animation": "framer-motion",
+    "dragAndDrop": "@dnd-kit/core, @dnd-kit/sortable, @dnd-kit/modifiers (API ready, UI deferred — Phase 4+)",
+    "charts": "recharts",
+    "confetti": "canvas-confetti",
+    "typesConfetti": "@types/canvas-confetti (dev dependency)",
+    "errorBoundaries": "@/core/error-boundary (ModuleErrorBoundary per module)",
+    "glassTheme": {
+      "cssVariables": true,
+      "tailwindColors": ["glass.*", "accent.*", "surface.*"],
+      "utilities": [".glass-card", ".habit-card-glass", ".profile-btn", ".glass-input", ".chart-tooltip-glass", ".skeleton"]
+    }
+  },
+  "backend": {
+    "hosting": "Netlify Functions (not touched until go-live)",
+    "database": {
+      "prod": "Neon (standalone account, pooled connection for app, direct for migrations)",
+      "dev": "Postgres 16 in Docker (habit_tracker database)",
+      "test": "Postgres 16 in Docker (habit_tracker_test database)"
+    },
+    "orm": "Drizzle ORM",
+    "validation": "Zod at every API/server-action boundary"
+  },
+  "testing": {
+    "unitIntegration": "Vitest (src/modules/*/tests/)",
+    "e2e": "Playwright smoke tests (e2e/tests/smoke.spec.ts, desktop + mobile Chrome projects)",
+    "typeChecking": "tsc --noEmit (gate before each phase, passes clean)",
+    "linting": "ESLint with boundaries plugin (@typescript-eslint v7)",
+    "buildVerification": "npm run build (production build verified)"
+  },
+  "architecture": {
+    "pattern": "Two-module architecture: /modules/profiles, /modules/habits",
+    "core": "/src/core owns shared types, schema (profiles only), db client, logger, IST date helper, health check",
+    "syncStrategy": "Polling (15s interval) + refetch-on-window-focus + optimistic updates",
+    "conflictResolution": "Last-write-wins for habit edits/reorder; unique constraint on completions for race safety",
+    "pollingPauseConditions": [
+      "Tab not visible (visibilitychange event)",
+      "Active drag gesture (isDragging state flag, reserved for dnd-kit integration)"
+    ],
+    "profileSwitchBehavior": "Invalidates all habits/progress/history queries on activeProfileId change"
+  },
+  "standardsDocs": {
+    "location": "docs/standards/",
+    "files": [
+      "design-system.md",
+      "coding-standards.md",
+      "phase-gate-protocol.md",
+      "progress-log-template.md"
+    ],
+    "status": "Written in Phase 4 (originated from this app)"
+  },
+  "moduleStructure": {
+    "core": "/src/core — profiles schema, db client, contracts, errors, logger, ist-date helper, health check, error-boundary (Phase 4)",
+    "profilesModule": "/src/modules/profiles — CRUD actions, ProfileSwitcher component, unit tests",
+    "habitsModule": "/src/modules/habits — habits + habit_completions schema, CRUD/complete/reorder actions, HabitCard/HabitBoard/DailyProgress/ConfettiCelebration/HistoryChart components"
+  },
+  "apiRoutes": {
+    "profiles": ["/api/profiles (GET POST)", "/api/profiles/[id] (GET PATCH DELETE)"],
+    "habits": [
+      "/api/habits (GET POST)",
+      "/api/habits/[id] (GET PATCH DELETE)",
+      "/api/habits/[id]/completion (POST)",
+      "/api/habits/reorder (POST)",
+      "/api/habits/progress (GET — Phase 3)",
+      "/api/habits/history (GET — Phase 3)"
+    ],
+    "health": ["/api/health"]
+  },
+  "e2eTests": {
+    "framework": "Playwright",
+    "config": "playwright.config.ts",
+    "testDir": "e2e/tests/",
+    "testsFile": "e2e/tests/smoke.spec.ts",
+    "projects": ["chromium (Desktop Chrome)", "Mobile Chrome (Pixel 7)"],
+    "coverage": [
+      "Health check API",
+      "Root page redirect",
+      "Profile switcher rendering",
+      "Habit board glass card rendering",
+      "Empty state / habit cards",
+      "Progress bar zero-target handling",
+      "History chart render (no JS errors)",
+      "Error boundary (no initial load failures)",
+      "Mobile viewport rendering",
+      "Polling API error tolerance"
+    ]
+  },
+  "phase4Additions": {
+    "glassThemeEnhancements": [
+      "Added --glass-bg-strong, --glass-active CSS variables",
+      "Added .glass-card--active, .glass-card--strong utility classes",
+      "Added skeleton loading animation (shimmer keyframe)",
+      "Added progress-bar-fill animated class",
+      "Added .habit-card-glass, .profile-btn, .glass-input, .chart-tooltip-glass component utilities",
+      "Added prefers-reduced-motion media query support",
+      "Added tailwind animations: slide-down, pulse-glow, shimmer"
+    ],
+    "errorBoundaries": [
+      "Created src/core/error-boundary.tsx (ModuleErrorBoundary class component)",
+      "Wrapped ProfileSwitcher in profiles error boundary",
+      "Wrapped HabitBoard in habits error boundary",
+      "Both on /profiles/[id] page"
+    ]
+  }
+}

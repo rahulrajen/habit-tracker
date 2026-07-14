@@ -1,0 +1,26 @@
+# ============================================================================
+# Local Database — two Postgres 16 databases in one container
+# - habit_tracker       (dev, manually seeded, persists across restarts)
+# - habit_tracker_test  (automated suite only, reset freely)
+# ============================================================================
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: habit-tracker-dev
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: habit_tracker
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
