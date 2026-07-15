@@ -2,7 +2,7 @@
 
 // ============================================================================
 // ProfileHomeContent — Client component that wraps HabitBoard with TopBar
-// Manages habit creation state and history popout visibility
+// Manages history popout visibility (habit creation moved to settings page)
 // ============================================================================
 
 import { useState } from 'react';
@@ -15,7 +15,6 @@ interface ProfileHomeContentProps {
 }
 
 export default function ProfileHomeContent({ profileId }: ProfileHomeContentProps) {
-  const [showCreateForm, setShowCreateForm] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 
   return (
@@ -24,10 +23,7 @@ export default function ProfileHomeContent({ profileId }: ProfileHomeContentProp
         {/* Responsive TopBar */}
         <TopBar
           currentProfileId={profileId}
-          onAddHabit={() => setShowCreateForm(true)}
           onShowHistory={() => setShowHistory(true)}
-          showCreateForm={showCreateForm}
-          onCreateFormCancel={() => setShowCreateForm(false)}
         />
 
         {/* Habit board for active profile */}

@@ -2,6 +2,7 @@
 // ProfileSwitcher — Client component for profile management UI
 // Extracted from /profiles/[id]/page.tsx to respect 150-line boundary (Pillar 1)
 // Handles: profile list, create form, archive button, inline target editing
+// Post-Go-Live v4: No auto-navigation on click — just updates state + invalidates queries
 // ============================================================================
 
 'use client';
@@ -66,7 +67,10 @@ async function updateTarget(id: number, target_points: number): Promise<Profile>
   return apiFetch<Profile>(`/api/profiles/${id}`, { method: 'PATCH', body: JSON.stringify({ target_points }) });
 }
 
-export default function ProfileSwitcher() {
+export default function ProfileSwitcher({ onProfileSelect }: { onProfileSelect?: (profileId: string) => void }) {
+  // Note: onProfileSelect is called when a profile is clicked.
+  // The parent component decides what to do — navigate, update state, etc.
+  // This component does NOT auto-navigate.
   const router = useRouter();
   const params = useParams();
   const queryClient = useQueryClient();
@@ -78,12 +82,12 @@ export default function ProfileSwitcher() {
   const [dailyTarget, setDailyTarget] = useState<number | ''>(10);
 
   // Resolve active profile ID from URL params (source of truth)
+  // Do NOT auto-navigate on profile click — let parent handle navigation
   const [activeProfileId, setActiveProfileId] = useState<string | null>(null);
 
   useEffect(() => {
     if (params.id) {
       setActiveProfileId(params.id as string);
-      try { localStorage.setItem(STORAGE_KEY, params.id as string); } catch { /* noop */ }
     }
   }, [params.id]);
 
@@ -92,9 +96,9 @@ export default function ProfileSwitcher() {
   // Invalidate habits queries when profile changes (ensures clean data on switch)
   const invalidateHabitsQueries = () => { void queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] === 'habits' || query.queryKey[0] === 'progress' || query.queryKey[0] === 'history' }); };
 
-  const createMutation = useMutation({ mutationFn: createProfile, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['profiles'] }); invalidateHabitsQueries(); setShowCreateForm(false); setNewName(''); setSelectedEmoji('\u{1F464}'); setDailyTarget(10); } });
-  const archiveMutation = useMutation({ mutationFn: archiveProfile, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['profiles'] }); invalidateHabitsQueries(); if (activeProfileId) { const remaining = profiles.filter((p) => p.id.toString() !== activeProfileId); if (remaining.length > 0) router.replace(`/profiles/${remaining[0].id}`); } } });
-  const targetMutation = useMutation({ mutationFn: ({ id, target_points }: { id: number; target_points: number }) => updateTarget(id, target_points), onMutate: async ({ id, target_points }) => { await queryClient.cancelQueries({ queryKey: ['profiles'] }); const previous = queryClient.getQueryData<Profile[]>(['profiles']); if (previous) queryClient.setQueryData(['profiles'], previous.map((p) => (p.id === id ? { ...p, target_points } : p))); return { previous }; }, onError: (_err, _vars, context) => { if (context?.previous) queryClient.setQueryData(['profiles'], context.previous); }, onSettled: () => { void queryClient.invalidateQueries({ queryKey: ['profiles'] }); setEditingTargetId(null); } });
+   const createMutation = useMutation({ mutationFn: createProfile, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['profiles'] }); invalidateHabitsQueries(); setShowCreateForm(false); setNewName(''); setSelectedEmoji('\u{1F464}'); setDailyTarget(10); } });
+   const archiveMutation = useMutation({ mutationFn: archiveProfile, onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['profiles'] }); invalidateHabitsQueries(); if (activeProfileId) { const remaining = profiles.filter((p) => p.id.toString() !== activeProfileId); if (remaining.length > 0) router.replace(`/profiles/${remaining[0].id}`); } } });
+   const targetMutation = useMutation({ mutationFn: ({ id, target_points }: { id: number; target_points: number }) => updateTarget(id, target_points), onMutate: async ({ id, target_points }) => { await queryClient.cancelQueries({ queryKey: ['profiles'] }); const previous = queryClient.getQueryData<Profile[]>(['profiles']); if (previous) queryClient.setQueryData(['profiles'], previous.map((p) => (p.id === id ? { ...p, target_points } : p))); return { previous }; }, onError: (_err, _vars, context) => { if (context?.previous) queryClient.setQueryData(['profiles'], context.previous); }, onSettled: () => { void queryClient.invalidateQueries({ queryKey: ['profiles'] }); setEditingTargetId(null); } });
 
   // activeProfile is used implicitly via activeProfileId in the template below
   void profiles.find((p) => p.id.toString() === activeProfileId);
@@ -115,7 +119,23 @@ export default function ProfileSwitcher() {
       {profiles.map((profile) => (
         <div key={profile.id} className={`glass-card p-3 transition-all ${profile.id.toString() === activeProfileId ? 'border-accent-blue/50 ring-1 ring-accent-blue/30' : ''}`}>
           <div className="flex items-center justify-between">
-            <button onClick={() => router.replace(`/profiles/${profile.id}`)} disabled={profile.id.toString() === activeProfileId} className="flex flex-1 items-center gap-3 text-left">
+            {/* Click profile: update local state + notify parent via callback.
+                No auto-navigation — parent decides what to do. */}
+            <button onClick={() => {
+              if (profile.id.toString() === activeProfileId) return; // already active
+              setActiveProfileId(profile.id.toString());
+              try { localStorage.setItem(STORAGE_KEY, profile.id.toString()); } catch { /* noop */ }
+              // Invalidate all queries so parent can refetch with new profile ID
+              void queryClient.invalidateQueries({ predicate: (query) => 
+                query.queryKey[0] === 'habits' || 
+                query.queryKey[0] === 'progress' || 
+                query.queryKey[0] === 'profiles' ||
+                query.queryKey[0] === 'streak' ||
+                query.queryKey[0] === 'history'
+              });
+              // Notify parent component of profile change
+              onProfileSelect?.(profile.id.toString());
+            }} disabled={profile.id.toString() === activeProfileId} className="flex flex-1 items-center gap-3 text-left">
               <span className="text-xl">{profile.emoji}</span>
               <div><p className="font-medium text-gray-100">{profile.name}</p>{profile.id.toString() === activeProfileId && <span className="text-xs text-accent-blue">Active</span>}</div>
             </button>

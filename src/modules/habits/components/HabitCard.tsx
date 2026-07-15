@@ -1,6 +1,7 @@
 // ============================================================================
 // HabitCard — Single habit card with tap-to-complete animation
-// Post-Go-Live: Enhanced glass styling matching HabitBoard
+// Post-Go-Live v4: No checkbox/points input, just emoji + text + points
+// Full card is clickable to toggle completion status
 // ============================================================================
 
 'use client';
@@ -37,28 +38,28 @@ export default function HabitCard({ habit, onToggle }: HabitCardProps) {
           : 'border-white/10 bg-white/5 hover:border-indigo-400/40 hover:bg-white/10 hover:shadow-[0_4px_20px_rgba(99,102,241,0.15)]'
       }`}
     >
-      {/* Completion indicator */}
-      <div
-        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border transition-colors ${
-          isCompleted
-            ? 'border-green-400 bg-green-400 text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]'
-            : 'border-white/20'
-        }`}
-      >
-        {isCompleted && <span className="text-sm">&#10003;</span>}
-      </div>
-
       {/* Emoji */}
-      <span className="text-xl">{habit.emoji}</span>
+      <span className="text-xl flex-shrink-0">{habit.emoji}</span>
 
       {/* Text + Points */}
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         <span
           className={`block text-sm ${isCompleted ? 'line-through text-gray-500' : 'text-gray-100'}`}
         >
           {habit.text}
         </span>
         <span className="text-xs text-indigo-400">{habit.points} pts</span>
+      </div>
+
+      {/* Completion indicator — small checkmark on the right */}
+      <div
+        className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border transition-colors ${
+          isCompleted
+            ? 'border-green-400 bg-green-400 text-white shadow-[0_0_8px_rgba(34,197,94,0.4)]'
+            : 'border-transparent'
+        }`}
+      >
+        {isCompleted && <span className="text-xs">&#10003;</span>}
       </div>
     </motion.button>
   );

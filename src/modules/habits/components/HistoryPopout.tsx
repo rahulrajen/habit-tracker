@@ -4,6 +4,7 @@
 // HistoryPopout — iOS-style floating modal panel
 // Contains streak stats + 30-day history chart
 // Glassmorphic design: scale/fade pop-in instead of slide from right
+// Mobile responsive: adapts to screen size
 // ============================================================================
 
 import { useQuery } from '@tanstack/react-query';
@@ -30,25 +31,25 @@ export default function HistoryPopout({ profileId, show, onClose }: HistoryPopou
             className="fixed inset-0 z-[199] bg-black/30 backdrop-blur-sm"
           />
 
-          {/* Popout panel — iOS-style center pop */}
+          {/* Popout panel — iOS-style center pop, responsive for mobile/desktop */}
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300, mass: 0.8 }}
-            className="fixed left-1/2 top-20 z-[200] w-[400px] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-2xl"
+            className="fixed left-1/2 top-[5vh] z-[200] w-[95vw] max-w-sm -translate-x-1/2 rounded-xl border border-white/10 bg-white/5 p-4 shadow-2xl backdrop-blur-2xl sm:top-16 sm:max-w-md sm:p-5"
           >
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-xs text-gray-400 transition-all hover:bg-white/10 hover:text-white"
+              className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-xs text-gray-400 transition-all hover:bg-white/10 hover:text-white sm:top-3 sm:right-3"
               aria-label="Close history"
             >
               ✕
             </button>
 
             {/* Title */}
-            <h3 className="mb-4 text-base font-semibold text-gray-100 pr-8">
+            <h3 className="mb-3 pr-8 text-base font-semibold text-gray-100 sm:mb-4">
               Activity & Streak
             </h3>
 
@@ -58,8 +59,10 @@ export default function HistoryPopout({ profileId, show, onClose }: HistoryPopou
             {/* Divider */}
             <div className="my-4 border-t border-white/8" />
 
-            {/* Chart */}
-            <HistoryChart profileId={profileId} days={30} height={200} />
+            {/* Chart — responsive via ResponsiveContainer (always width: 100%) */}
+            <div className="h-40 sm:h-[200px]">
+              <HistoryChart profileId={profileId} days={30} height={160} />
+            </div>
           </motion.div>
         </>
       )}
